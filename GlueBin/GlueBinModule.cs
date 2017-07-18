@@ -49,12 +49,23 @@ namespace GlueBin
                 var inserted = false;
                 do
                 {
-                    if (collection.Count(x => x.Name == p.Name) == 0)
+                    var likeItem = collection.Find(x => x.Name == x.Name).FirstOrDefault();
+                    if (likeItem == null)
                     {
                         collection.InsertOne(p);
                         inserted = true;
                     }
-                    else p.Name = Path.GetRandomFileName();
+                    else if (likeItem.Name == p.Name && likeItem.UserName == p.UserName)
+                    {
+                        // if we're the same person, we can just replace inline
+                        p._id = likeItem._id;
+                        collection.ReplaceOne(x => x._id == likeItem._id, p);
+                        inserted = true;
+                    }
+                    else
+                    {
+                        p.Name = Path.GetRandomFileName();
+                    }
                 } while (!inserted);
 
                 return Response.AsRedirect("/paste/id/" + p._id);
