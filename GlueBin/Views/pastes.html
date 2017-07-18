@@ -1,0 +1,22 @@
+﻿@Master['master.html']
+@Section['Title']
+Public Pastes
+@EndSection
+@Section['Body']
+    <table id="pastes">
+        <thead>
+            <tr>
+                <td id="pastes-header-name">Post name</td>
+                <td>Posted on</td>
+                <td>Posted by</td>
+            </tr>
+        </thead>
+        @Each.Items
+            <tr>
+                <td><a href="/pastes/id/@Current._id">@!Current.Name</a></td>
+                <td>@!Current.Posted</td>
+                <td>@!Current.UserName</td>
+            </tr>
+        @EndEach
+    </table>
+@EndSection

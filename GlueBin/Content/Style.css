@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+    font-size: 110%;
+}
+/* The header at the top of the page. */
+#head {
+    background-color: #353A5A;
+    color: white;
+    width: auto;
+    padding: 0.2em;
+}
+/* The links */
+#links {
+    float: right;
+    padding: 0.3em;
+}
+#links a {
+    color: white;
+    font-size: 80%;
+    text-decoration: none;
+}
+/* The meat of your page. */
+#cont {
+    margin: auto;
+    width: 90%;
+}
+/* Per-page things */
+/* Paste contents */
+#cont pre {
+    background-color: #EEE;
+    padding: 0.8em;
+}
+/* The metadata at the bottom of the post. */
+#meta {
+    color: gray;
+    font-size: 60%;
+}
+/* Post listings */
+#pastes {
+    width: 100%;
+}
+#pastes thead td {
+    font-weight: 600;
+}
+#pastes-header-name {
+    width: 65%;
+}
+/* Paste submission */
+#submitPaste textarea {
+    width: 100%;
+}
+/* The footer at the bottom of the page. */
+#foot { }

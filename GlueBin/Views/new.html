@@ -1,0 +1,19 @@
+﻿@Master['master.html']
+@Section['Title']
+Submit Paste
+@EndSection
+@Section['Body']
+    <form action="/paste" method="post" id="submitPaste">
+        <textarea name="Content" cols="40" rows="12"></textarea>
+        <br/>
+        <label>
+            Paste name
+            <input type="text" name="Name" />
+        </label>
+        <label>
+            <input type="checkbox" name="Public" />
+            Public
+        </label>
+        <input type="submit" />
+    </form>
+@EndSection
