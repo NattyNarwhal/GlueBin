@@ -11,7 +11,8 @@ namespace GlueBin
 {
     public class GlueBinModule : NancyModule
     {
-        const string constStr = "mongodb://dbadmin:password@localhost:27017/pastes?authSource=admin";
+        const string constStr =
+            "mongodb://dbadmin:password@localhost:27017/pastes?authSource=admin";
 
         public GlueBinModule()
         {
@@ -39,7 +40,8 @@ namespace GlueBin
             Post["/paste"] = _ =>
             {
                 var p = this.Bind<Paste>("UserName", "Posted", "_id");
-                p.Name = string.IsNullOrWhiteSpace(p.Name) ? Path.GetRandomFileName() : p.Name;
+                p.Name = string.IsNullOrWhiteSpace(p.Name) ?
+                    Path.GetRandomFileName() : p.Name;
                 p.Posted = DateTime.Now;
                 p.UserName = Context.CurrentUser?.UserName;
 
