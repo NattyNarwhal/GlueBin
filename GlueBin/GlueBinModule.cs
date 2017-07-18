@@ -43,9 +43,17 @@ namespace GlueBin
                 p.Posted = DateTime.Now;
                 p.UserName = Context.CurrentUser?.UserName;
 
-                if (collection.Count(x => x.Name == p.Name) == 0)
-                    collection.InsertOne(p);
-                else return HttpStatusCode.Conflict;
+                // keep generating new names until one works
+                var inserted = false;
+                do
+                {
+                    if (collection.Count(x => x.Name == p.Name) == 0)
+                    {
+                        collection.InsertOne(p);
+                        inserted = true;
+                    }
+                    else p.Name = Path.GetRandomFileName();
+                } while (!inserted);
 
                 return Response.AsRedirect("/paste/id/" + p._id);
             };
