@@ -11,22 +11,16 @@ namespace GlueBin
 {
     public class GlueBinModule : NancyModule
     {
-        const string constStr =
-            "mongodb://dbadmin:password@localhost:27017/pastes?authSource=admin";
-
         public GlueBinModule()
         {
-            var dbClient = new MongoClient(constStr);
-            var db = dbClient.GetDatabase("pastes");
-            var collection = db.GetCollection<Paste>("pastes");
-
             // Static pages
             Get["/"] = _ => View["new.html"];
             // Paste management
             Get["/(?<raw>paste|raw)/name/{name}"] = param =>
             {
                 var name = (string)param.name;
-                var item = collection.Find(x => x.Name == name).FirstOrDefault();
+                var item = DatabaseConnector.PasteCollection
+                    .Find(x => x.Name == name).FirstOrDefault();
                 return GetPastePage(item, param.raw == "raw");
             };
             Get["/(?<raw>paste|raw)/id/{id}"] = param =>
@@ -34,7 +28,8 @@ namespace GlueBin
                 ObjectId id;
                 if (!ObjectId.TryParse(param.id, out id))
                     return HttpStatusCode.BadRequest;
-                var item = collection.Find(x => x._id == id).FirstOrDefault();
+                var item = DatabaseConnector.PasteCollection
+                    .Find(x => x._id == id).FirstOrDefault();
                 return GetPastePage(item, param.raw == "raw");
             };
             Post["/paste"] = _ =>
@@ -49,17 +44,18 @@ namespace GlueBin
                 var inserted = false;
                 do
                 {
-                    var likeItem = collection.Find(x => x.Name == x.Name).FirstOrDefault();
+                    var likeItem = DatabaseConnector.PasteCollection
+                        .Find(x => x.Name == x.Name).FirstOrDefault();
                     if (likeItem == null)
                     {
-                        collection.InsertOne(p);
+                        DatabaseConnector.PasteCollection.InsertOne(p);
                         inserted = true;
                     }
                     else if (likeItem.Name == p.Name && likeItem.UserName == p.UserName)
                     {
                         // if we're the same person, we can just replace inline
                         p._id = likeItem._id;
-                        collection.ReplaceOne(x => x._id == likeItem._id, p);
+                        DatabaseConnector.PasteCollection.ReplaceOne(x => x._id == likeItem._id, p);
                         inserted = true;
                     }
                     else
@@ -73,9 +69,19 @@ namespace GlueBin
             // Listings
             Get["/pastes"] = _ =>
             {
-                var items = collection.Find(x => x.Public).Limit(25).ToList();
+                var items = DatabaseConnector.PasteCollection
+                    .Find(x => x.Public).Limit(25).ToList();
                 return View["pastes.html", new { Items = items }];
             };
+#if DEBUG
+            // Debug routes
+            Get["/debug/auth"] = _ =>
+            {
+                this.RequiresAuthentication();
+                return string.Format("User: {0}; Claims: {1}",
+                    Context.CurrentUser?.UserName, string.Join(", ",Context.CurrentUser?.Claims));
+            };
+#endif
         }
 
         dynamic GetPastePage(Paste paste, bool raw)
