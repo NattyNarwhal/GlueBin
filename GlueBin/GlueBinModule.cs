@@ -73,7 +73,8 @@ namespace GlueBin
                 if (pasteNeedsAuth)
                     this.RequiresClaims("Paste");
 
-                var p = this.Bind<Paste>("UserName", "Posted", "_id");
+                var p = this.Bind<Paste>("UserName", "Posted", "_id",
+                    "RenderAsHtml");
                 p.Name = string.IsNullOrWhiteSpace(p.Name) ?
                     Path.GetRandomFileName() : p.Name;
                 p.Posted = DateTime.Now;
@@ -94,7 +95,8 @@ namespace GlueBin
                     {
                         // if we're the same person, we can just replace inline
                         p._id = likeItem._id;
-                        DatabaseConnector.PasteCollection.ReplaceOne(x => x._id == likeItem._id, p);
+                        DatabaseConnector.PasteCollection
+                            .ReplaceOne(x => x._id == likeItem._id, p);
                         inserted = true;
                     }
                     else
@@ -127,7 +129,8 @@ namespace GlueBin
             {
                 this.RequiresAuthentication();
                 return string.Format("User: {0}; Claims: {1}",
-                    Context.CurrentUser?.UserName, string.Join(", ",Context.CurrentUser?.Claims));
+                    Context.CurrentUser?.UserName,
+                    string.Join(", ",Context.CurrentUser?.Claims));
             };
 #endif
         }
