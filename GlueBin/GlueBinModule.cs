@@ -180,7 +180,7 @@ namespace GlueBin
                     return r;
                 }
                 else
-                    return View["paste.html", paste];
+                    return View["paste.cshtml", paste];
             else
                 return HttpStatusCode.NotFound;
         }

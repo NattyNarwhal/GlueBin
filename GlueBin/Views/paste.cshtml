@@ -1,0 +1,19 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{ 
+    ViewBag.Title = Model.Name;
+}
+
+@if (Model.RenderAsHtml) {
+    <text><pre>@Html.Raw(Model.Content)</pre></text>
+} else {
+    <text><pre>@Model.Content</pre></text>
+}
+@{
+    var userName = Model.UserName ?? "no one";
+    var language = Model.HighlightLanguage ?? "plain text";
+}
+<div id="meta">
+    Posted on @Model.Posted by @userName in @language
+                                          
+    (<a href="/raw/id/@Model._id">Plain text</a> - <a href="/delete/id/@Model._id">Delete</a>)
+</div>
