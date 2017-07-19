@@ -38,6 +38,7 @@ namespace GlueBin
                 var name = (string)param.name;
                 var item = PasteCollection
                     .Find(x => x.Name == name).FirstOrDefault();
+                if (item == null) return HttpStatusCode.NotFound;
                 if (!raw && !string.IsNullOrWhiteSpace(item.HighlightLanguage))
                 {
                     item.Content = hl
@@ -56,6 +57,7 @@ namespace GlueBin
                     return HttpStatusCode.BadRequest;
                 var item = PasteCollection
                     .Find(x => x._id == id).FirstOrDefault();
+                if (item == null) return HttpStatusCode.NotFound;
                 if (!raw && !string.IsNullOrWhiteSpace(item.HighlightLanguage))
                 {
                     item.Content = hl
