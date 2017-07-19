@@ -112,7 +112,11 @@ namespace GlueBin
             {
                 var items = DatabaseConnector.PasteCollection
                     .Find(x => x.Public).Limit(25).ToList();
-                return View["pastes.html", new { Items = items }];
+                return View["pastes.html", new
+                {
+                    Items = items,
+                    Title = "Public Pastes",
+                }];
             };
             Get["/pastes/own"] = _ =>
             {
@@ -121,7 +125,10 @@ namespace GlueBin
                 var items = DatabaseConnector.PasteCollection
                     .Find(x => x.UserName == username)
                     .Limit(25).ToList();
-                return View["pastes.html", new { Items = items }];
+                return View["pastes.html", new {
+                    Items = items,
+                    Title = "Your Pastes",
+                }];
             };
 #if DEBUG
             // Debug routes
