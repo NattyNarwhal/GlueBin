@@ -2,6 +2,7 @@ using GlueBin.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Nancy;
+using Nancy.ErrorHandling;
 using Nancy.ModelBinding;
 using Nancy.Security;
 using System;
@@ -11,6 +12,9 @@ namespace GlueBin
 {
     public class GlueBinModule : NancyModule
     {
+        // TODO: Move config into... config (that doesn't depend on ASP.NET)
+        const bool pasteNeedsAuth = true;
+
         public GlueBinModule()
         {
             // Static pages
@@ -34,6 +38,9 @@ namespace GlueBin
             };
             Post["/paste"] = _ =>
             {
+                if (pasteNeedsAuth)
+                    this.RequiresClaims("Paste");
+
                 var p = this.Bind<Paste>("UserName", "Posted", "_id");
                 p.Name = string.IsNullOrWhiteSpace(p.Name) ?
                     Path.GetRandomFileName() : p.Name;
@@ -45,7 +52,7 @@ namespace GlueBin
                 do
                 {
                     var likeItem = DatabaseConnector.PasteCollection
-                        .Find(x => x.Name == x.Name).FirstOrDefault();
+                        .Find(x => x.Name == p.Name).FirstOrDefault();
                     if (likeItem == null)
                     {
                         DatabaseConnector.PasteCollection.InsertOne(p);
