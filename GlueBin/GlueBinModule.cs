@@ -6,6 +6,7 @@ using Nancy.ErrorHandling;
 using Nancy.ModelBinding;
 using Nancy.Security;
 using System;
+using System.Linq;
 using System.IO;
 
 namespace GlueBin
@@ -19,7 +20,7 @@ namespace GlueBin
         {
             // Static pages
             Get["/"] = _ => View["new.html"];
-            // Paste management
+            // Show pages
             Get["/(?<raw>paste|raw)/name/{name}"] = param =>
             {
                 var name = (string)param.name;
@@ -36,6 +37,10 @@ namespace GlueBin
                     .Find(x => x._id == id).FirstOrDefault();
                 return GetPastePage(item, param.raw == "raw");
             };
+            // Deletion
+            Delete["/(?<raw>paste|raw)/id/{id}"] = DeleteRoute;
+            Get["/delete/id/{id}"] = DeleteRoute;
+            // Posting a paste
             Post["/paste"] = _ =>
             {
                 if (pasteNeedsAuth)
@@ -80,6 +85,15 @@ namespace GlueBin
                     .Find(x => x.Public).Limit(25).ToList();
                 return View["pastes.html", new { Items = items }];
             };
+            Get["/pastes/own"] = _ =>
+            {
+                this.RequiresAuthentication();
+                var username = Context.CurrentUser?.UserName;
+                var items = DatabaseConnector.PasteCollection
+                    .Find(x => x.UserName == username)
+                    .Limit(25).ToList();
+                return View["pastes.html", new { Items = items }];
+            };
 #if DEBUG
             // Debug routes
             Get["/debug/auth"] = _ =>
@@ -89,6 +103,25 @@ namespace GlueBin
                     Context.CurrentUser?.UserName, string.Join(", ",Context.CurrentUser?.Claims));
             };
 #endif
+        }
+
+        dynamic DeleteRoute(dynamic param)
+        {
+            this.RequiresAuthentication();
+
+            ObjectId id;
+            if (!ObjectId.TryParse(param.id, out id))
+                return HttpStatusCode.BadRequest;
+            var item = DatabaseConnector.PasteCollection
+                .Find(x => x._id == id).FirstOrDefault();
+
+            if (item.UserName == Context.CurrentUser?.UserName ||
+                (Context.CurrentUser?.Claims.Contains("DeleteAny") ?? false))
+                DatabaseConnector.PasteCollection
+                    .DeleteOne(x => x._id == item._id);
+            else return HttpStatusCode.Unauthorized;
+
+            return HttpStatusCode.OK;
         }
 
         dynamic GetPastePage(Paste paste, bool raw)
