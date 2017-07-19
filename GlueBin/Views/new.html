@@ -11,6 +11,17 @@ Submit Paste
             <input type="text" name="Name" />
         </label>
         <label>
+            Highlight language
+            <select name="HighlightLanguage">
+                <option></option>
+                <optgroup label="Syntax Highlighting">
+                    @Each.Languages
+                    <option>@Current</option>
+                    @EndEach
+                </optgroup>
+            </select>
+        </label>
+        <label>
             <input type="checkbox" name="Public" />
             Public
         </label>

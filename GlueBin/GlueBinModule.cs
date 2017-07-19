@@ -8,6 +8,8 @@ using Nancy.Security;
 using System;
 using System.Linq;
 using System.IO;
+using Highlight;
+using Highlight.Engines;
 
 namespace GlueBin
 {
@@ -18,24 +20,49 @@ namespace GlueBin
 
         public GlueBinModule()
         {
-            // Static pages
-            Get["/"] = _ => View["new.html"];
+            var hl = new Highlighter(new HtmlEngine());
+
+            // Paste pages
+            Get["/"] = _ =>
+            {
+                return View["new.html", new {
+                    Languages = hl.Configuration.Definitions.Keys
+                }];
+            };
             // Show pages
             Get["/(?<raw>paste|raw)/name/{name}"] = param =>
             {
+                var raw = param.raw == "raw";
                 var name = (string)param.name;
                 var item = DatabaseConnector.PasteCollection
                     .Find(x => x.Name == name).FirstOrDefault();
-                return GetPastePage(item, param.raw == "raw");
+                if (!raw && !string.IsNullOrWhiteSpace(item.HighlightLanguage))
+                {
+                    item.Content = hl
+                        .Highlight(item.HighlightLanguage, item.Content);
+                    item.RenderAsHtml = true;
+                    return GetPastePage(item, raw);
+                }
+                else
+                    return GetPastePage(item, raw);
             };
             Get["/(?<raw>paste|raw)/id/{id}"] = param =>
             {
+                var raw = param.raw == "raw";
                 ObjectId id;
                 if (!ObjectId.TryParse(param.id, out id))
                     return HttpStatusCode.BadRequest;
                 var item = DatabaseConnector.PasteCollection
                     .Find(x => x._id == id).FirstOrDefault();
-                return GetPastePage(item, param.raw == "raw");
+                if (!raw && !string.IsNullOrWhiteSpace(item.HighlightLanguage))
+                {
+                    item.Content = hl
+                        .Highlight(item.HighlightLanguage, item.Content);
+                    item.RenderAsHtml = true;
+                    return GetPastePage(item, raw);
+                }
+                else
+                    return GetPastePage(item, raw);
             };
             // Deletion
             Delete["/(?<raw>paste|raw)/id/{id}"] = DeleteRoute;
