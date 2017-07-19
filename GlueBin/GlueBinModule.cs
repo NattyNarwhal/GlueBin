@@ -27,7 +27,7 @@ namespace GlueBin
             // Paste pages
             Get["/"] = _ =>
             {
-                return View["new.html", new {
+                return View["NewPaste.cshtml", new {
                     Languages = hl.Configuration.Definitions.Keys
                 }];
             };
@@ -115,7 +115,7 @@ namespace GlueBin
             {
                 var items = PasteCollection
                     .Find(x => x.Public).Limit(25).ToList();
-                return View["pastes.html", new
+                return View["Pastes.cshtml", new
                 {
                     Items = items,
                     Title = "Public Pastes",
@@ -128,7 +128,7 @@ namespace GlueBin
                 var items = PasteCollection
                     .Find(x => x.UserName == username)
                     .Limit(25).ToList();
-                return View["pastes.html", new {
+                return View["Pastes.cshtml", new {
                     Items = items,
                     Title = "Your Pastes",
                 }];
@@ -180,7 +180,7 @@ namespace GlueBin
                     return r;
                 }
                 else
-                    return View["paste.cshtml", paste];
+                    return View["Paste.cshtml", paste];
             else
                 return HttpStatusCode.NotFound;
         }

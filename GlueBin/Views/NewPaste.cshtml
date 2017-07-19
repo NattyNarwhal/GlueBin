@@ -1,0 +1,29 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    ViewBag.Title = "New Paste";
+}
+
+<form action="/paste" method="post" id="submitPaste">
+    <textarea name="Content" cols="40" rows="12"></textarea>
+    <br />
+    <label>
+        Paste name
+        <input type="text" name="Name" />
+    </label>
+    <label>
+        Highlight language
+        <select name="HighlightLanguage">
+            <option></option>
+            <optgroup label="Syntax Highlighting">
+                @foreach (var l in Model.Languages) {
+                    <text><option>@l</option></text>
+                }
+            </optgroup>
+        </select>
+    </label>
+    <label>
+        <input type="checkbox" name="Public" />
+        Public
+    </label>
+    <input type="submit" />
+</form>

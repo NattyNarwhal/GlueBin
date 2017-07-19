@@ -1,0 +1,24 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
+@{
+    ViewBag.Title = Model.Title;
+}
+
+<table id="pastes">
+    <thead>
+        <tr>
+            <td id="pastes-header-name">Post name</td>
+            <td>Language</td>
+            <td>Posted on</td>
+            <td>Poster</td>
+            @* TODO: With Razor, we could put administration tools inline *@
+        </tr>
+    </thead>
+    @foreach (var p in Model.Items) {
+        <tr>
+            <td><a href="/pastes/id/@p._id">@p.Name</a></td>
+            <td>@p.HighlightLanguage</td>
+            <td>@p.Posted</td>
+            <td>@p.UserName</td>
+        </tr>
+    }
+</table>
