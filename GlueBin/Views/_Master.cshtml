@@ -12,6 +12,10 @@
         <div id="links">
             <a href="/">New Paste</a>
             <a href="/pastes">Public Pastes</a>
+            @if (Context.CurrentUser != null)
+            {
+                <text><a href="/pastes/own">Your Pastes</a></text>
+            }
         </div>
     </div>
     <div id="cont">
