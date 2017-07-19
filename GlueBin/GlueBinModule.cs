@@ -11,6 +11,8 @@ using System.IO;
 using Highlight;
 using Highlight.Engines;
 
+using static GlueBin.DatabaseConnector;
+
 namespace GlueBin
 {
     public class GlueBinModule : NancyModule
@@ -34,7 +36,7 @@ namespace GlueBin
             {
                 var raw = param.raw == "raw";
                 var name = (string)param.name;
-                var item = DatabaseConnector.PasteCollection
+                var item = PasteCollection
                     .Find(x => x.Name == name).FirstOrDefault();
                 if (!raw && !string.IsNullOrWhiteSpace(item.HighlightLanguage))
                 {
@@ -52,7 +54,7 @@ namespace GlueBin
                 ObjectId id;
                 if (!ObjectId.TryParse(param.id, out id))
                     return HttpStatusCode.BadRequest;
-                var item = DatabaseConnector.PasteCollection
+                var item = PasteCollection
                     .Find(x => x._id == id).FirstOrDefault();
                 if (!raw && !string.IsNullOrWhiteSpace(item.HighlightLanguage))
                 {
@@ -84,18 +86,19 @@ namespace GlueBin
                 var inserted = false;
                 do
                 {
-                    var likeItem = DatabaseConnector.PasteCollection
+                    var likeItem = PasteCollection
                         .Find(x => x.Name == p.Name).FirstOrDefault();
                     if (likeItem == null)
                     {
-                        DatabaseConnector.PasteCollection.InsertOne(p);
+                        PasteCollection.InsertOne(p);
                         inserted = true;
                     }
-                    else if (likeItem.Name == p.Name && likeItem.UserName == p.UserName)
+                    else if (likeItem.Name == p.Name && 
+                             likeItem.UserName == p.UserName)
                     {
                         // if we're the same person, we can just replace inline
                         p._id = likeItem._id;
-                        DatabaseConnector.PasteCollection
+                        PasteCollection
                             .ReplaceOne(x => x._id == likeItem._id, p);
                         inserted = true;
                     }
@@ -110,7 +113,7 @@ namespace GlueBin
             // Listings
             Get["/pastes"] = _ =>
             {
-                var items = DatabaseConnector.PasteCollection
+                var items = PasteCollection
                     .Find(x => x.Public).Limit(25).ToList();
                 return View["pastes.html", new
                 {
@@ -122,7 +125,7 @@ namespace GlueBin
             {
                 this.RequiresAuthentication();
                 var username = Context.CurrentUser?.UserName;
-                var items = DatabaseConnector.PasteCollection
+                var items = PasteCollection
                     .Find(x => x.UserName == username)
                     .Limit(25).ToList();
                 return View["pastes.html", new {
@@ -149,12 +152,12 @@ namespace GlueBin
             ObjectId id;
             if (!ObjectId.TryParse(param.id, out id))
                 return HttpStatusCode.BadRequest;
-            var item = DatabaseConnector.PasteCollection
+            var item = PasteCollection
                 .Find(x => x._id == id).FirstOrDefault();
 
             if (item.UserName == Context.CurrentUser?.UserName ||
                 (Context.CurrentUser?.Claims.Contains("DeleteAny") ?? false))
-                DatabaseConnector.PasteCollection
+                PasteCollection
                     .DeleteOne(x => x._id == item._id);
             else return HttpStatusCode.Unauthorized;
 

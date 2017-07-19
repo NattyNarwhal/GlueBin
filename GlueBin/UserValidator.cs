@@ -8,6 +8,8 @@ using Nancy.Security;
 using GlueBin.Models;
 using System.Security.Cryptography;
 
+using static GlueBin.DatabaseConnector;
+
 namespace GlueBin
 {
     public class UserValidator : IUserValidator
@@ -32,7 +34,7 @@ namespace GlueBin
 
         IUserIdentity IUserValidator.Validate(string username, string password)
         {
-            var dbUser = DatabaseConnector.UserCollection
+            var dbUser = UserCollection
                 .Find(x => x.UserName == username).FirstOrDefault();
             var hashedPassword = GetHashedPassword(password, dbUser.Salt);
             // test for auth
