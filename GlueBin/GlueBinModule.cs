@@ -163,7 +163,9 @@ namespace GlueBin
                     .DeleteOne(x => x._id == item._id);
             else return HttpStatusCode.Unauthorized;
 
-            return HttpStatusCode.OK;
+            return Response.AsRedirect(
+                Request.Headers.Referrer.Contains(id.ToString())
+                ? "/" : Request.Headers.Referrer );
         }
 
         dynamic GetPastePage(Paste paste, bool raw)

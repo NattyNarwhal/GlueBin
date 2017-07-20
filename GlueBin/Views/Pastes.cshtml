@@ -10,15 +10,28 @@
             <td>Language</td>
             <td>Posted on</td>
             <td>Poster</td>
-            @* TODO: With Razor, we could put administration tools inline *@
+            @if (Context.CurrentUser != null)
+            { 
+                <text><td>Actions</td></text>
+            }
         </tr>
     </thead>
     @foreach (var p in Model.Items) {
         <tr>
-            <td><a href="/pastes/id/@p._id">@p.Name</a></td>
+            <td><a href="/paste/id/@p._id">@p.Name</a></td>
             <td>@p.HighlightLanguage</td>
             <td>@p.Posted</td>
             <td>@p.UserName</td>
+            @if (Context.CurrentUser != null)
+            {
+                <text>
+                    <td>
+                        <a href="/delete/id/@p._id">
+                            Delete
+                        </a>
+                    </td>
+                </text>
+            }
         </tr>
     }
 </table>
