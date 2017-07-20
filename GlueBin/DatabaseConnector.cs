@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 
 namespace GlueBin
 {
@@ -12,9 +13,6 @@ namespace GlueBin
     /// </summary>
     public static class DatabaseConnector
     {
-        const string constStr =
-            "mongodb://dbadmin:password@localhost:27017/pastes?authSource=admin";
-
         static MongoClient dbClient;
         static IMongoDatabase db;
 
@@ -23,6 +21,8 @@ namespace GlueBin
 
         static DatabaseConnector()
         {
+            var constStr = WebConfigurationManager.AppSettings["mongo"];
+
             dbClient = new MongoClient(constStr);
             db = dbClient.GetDatabase("pastes");
 
