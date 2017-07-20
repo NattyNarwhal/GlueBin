@@ -1,6 +1,7 @@
 ﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<dynamic>
 @{
     ViewBag.Title = Model.Title;
+    ViewBag.SearchQuery = Model.Query ?? "";
 }
 
 <table id="pastes">

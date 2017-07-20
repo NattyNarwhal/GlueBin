@@ -113,6 +113,7 @@ namespace GlueBin
                 return Response.AsRedirect("/paste/id/" + p._id);
             };
             // Listings
+            // TODO: Pagination
             Get["/pastes"] = _ =>
             {
                 var items = PasteCollection
@@ -121,6 +122,7 @@ namespace GlueBin
                 {
                     Items = items,
                     Title = "Public Pastes",
+                    Query = ""
                 }];
             };
             Get["/pastes/own"] = _ =>
@@ -133,6 +135,24 @@ namespace GlueBin
                 return View["Pastes.cshtml", new {
                     Items = items,
                     Title = "Your Pastes",
+                    Query = ""
+                }];
+            };
+            Post["/pastes/search"] = _ =>
+            {
+                var query = (string)Request.Form.Query;
+                var username = Context.CurrentUser?.UserName;
+                var items = PasteCollection
+                    .Find(x =>
+                        (x.Public == true ||
+                            (username != null && x.UserName == username)) &&
+                        (x.Name.Contains(query) || x.Content.Contains(query)))
+                    .Limit(25).ToList();
+                return View["Pastes.cshtml", new
+                {
+                    Items = items,
+                    Title = "Results for " + query,
+                    Query = query
                 }];
             };
 #if DEBUG

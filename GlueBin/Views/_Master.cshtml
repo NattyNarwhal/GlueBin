@@ -16,6 +16,13 @@
             {
                 <text><a href="/pastes/own">Your Pastes</a></text>
             }
+            <form action="/pastes/search" method="post" style="display:inline">
+                <input type="search"
+                       placeholder="Search pastes..."
+                       name="Query"
+                       value="@ViewBag.SearchQuery"
+                       />
+            </form>
         </div>
     </div>
     <div id="cont">
